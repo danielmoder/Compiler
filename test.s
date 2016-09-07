@@ -1,3 +1,6 @@
+// Boiler plate for code from translator
+
+
 	.bss
 output:
 	.int
@@ -7,7 +10,7 @@ output:
 	.global _start
 
 _start:
-	// Numbers to be added
+	// To be replaced with translator code
 	movl	$3, %eax
 	movl	$2, %ebx
 	// Sum now in %ebx
