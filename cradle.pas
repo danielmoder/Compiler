@@ -6,6 +6,7 @@ const TAB = ^I;
 {Variables}
 var Look : char;
 
+
 {Read new characters from input stream}
 procedure Getchar;
 begin
@@ -82,28 +83,76 @@ begin
 end;
 
 
+procedure Expression; Forward;
 
-
-{Get single mathematical expression TERM}
-procedure Term;
+{Parse and translate a math FACTOR}
+procedure Factor;
 begin
-   EmitLn('movl $' + GetNum + ', %eax')
+   if Look = '(' then begin
+      Match('(');
+      Expression;
+      Match(')');
+      end
+   else if Look = '-' then begin
+      GetChar;
+      EmitLn('movq $' + GetNum + ', %r12');
+      EmitLn('neg %r12');
+      end
+   else
+      EmitLn('movq $' + GetNum + ', %r12');
 end;
 
-{Recognize + translate +}
+{Recognize and translate *}
+procedure Multiply;
+begin
+   Match('*');
+   Factor;
+   EmitLn('popq %r13');
+   EmitLn('imulq %r13, %r12');
+end;
+
+{Recognize and translate /}
+procedure Divide;
+begin
+   Match('/');
+   Factor;
+   EmitLn('popq %rax');
+   EmitLn('cqto');
+   EmitLn('idivq %r12');
+end;
+
+{Parse and translate a mult. term}
+procedure Term;
+begin
+   Factor;
+   while Look in ['*', '/'] do begin
+      EmitLn('pushq %r12');
+      case Look of
+	'*' : Multiply;
+	'/' : Divide;
+      else Expected('mult. operation');
+      end;
+   end;
+end;
+
+
+{Recognize and translate +}
 procedure Add;
 begin
    Match('+');
    Term;
-   EmitLn('addl %eax, %ebx');
+   EmitLn('popq %r13');
+   EmitLn('addq %r13, %r12');
 end;
 
-{Recognize + translate -}
+{Recognize and translate -}
 procedure Subtract;
 begin
    Match('-');
    Term;
-   EmitLn('subl %eax, %ebx');
+   EmitLn('popq %r13');
+   EmitLn('subq %r13, %r12');
+   EmitLn('neg %r12');
 end;
 
 
@@ -112,7 +161,7 @@ procedure Expression;
 begin
    Term;
    while Look in ['+', '-'] do begin
-      EmitLn('movl %eax, %ebx');
+      EmitLn('pushq %r12');
       case Look of
 	'+' : Add;
 	'-' : Subtract;
