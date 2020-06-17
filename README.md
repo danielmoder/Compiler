@@ -1,15 +1,13 @@
 # Compiler
-_A very simple compiler (in progress) written in Turbo Pascal, x86_
+A very simple compiler written in Turbo Pascal for x86. This exercise is coming from Jack Crenshaw's "Compiler Building Tutorial" (PDF available [here](https://www.stack.nl/~marcov/compiler.pdf))
 
-_Working through Jack Crenshaw's "Compiler Building Tutorial" (2012)_
-
-###Example usage:###
+### Example usage:
 `./compile.sh` (input: `2+(-1+5)*1`)
 
 `./final` (output: `6`)
 
 
-###To Do:###
+### To Do:
 
 - [x] Cradle (basic procedures for reading in characters)
 - [ ] Parsing:
